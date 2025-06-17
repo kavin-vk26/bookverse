@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Books - BookVerse</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .book-card { background: #fff; border-left: 6px solid #A3B18A; border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; gap: 20px; align-items: flex-start; }
+    .book-card h3 { color: #6C584C; }
+    .book-cover {
+      width: 90px;
+      height: 130px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+      background: #eee;
+      flex-shrink: 0;
+    }
+    @media (max-width: 600px) {
+      .book-card { flex-direction: column; align-items: stretch; }
+      .book-cover { margin-bottom: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">📚 BookVerse</div>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/add">Add Book</a>
+      <a href="/search">Search</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Search for Books</h1>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search by title, author, genre, or description..." />
+      <button id="search-button">Search</button>
+    </div>
+    <div class="results-container" id="results"></div>
+  </main>
+  <footer>© 2025 BookVerse. Made with ☕ & ❤️ by Kavin.</footer>
+  <script>
+    const input = document.getElementById('search-input');
+    const button = document.getElementById('search-button');
+    const resultsContainer = document.getElementById('results');
+    function performSearch(query) {
+      if (!query) { resultsContainer.innerHTML = ''; return; }
+      fetch(`/api/search?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          resultsContainer.innerHTML = '';
+          if (data.length === 0) {
+            resultsContainer.innerHTML = "<p>No books found.</p>";
+            return;
+          }
+          data.forEach(book => {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.innerHTML = `
+              <img 
+                src="${book.cover_url ? book.cover_url : '/default-book.png'}" 
+                alt="Book Cover" 
+                class="book-cover" 
+                onerror="this.src='/default-book.png';"
+              />
+              <div>
+                <h3>${book.title}</h3>
+                <p><strong>Author:</strong> ${book.author}</p>
+                <p><strong>Genre:</strong> ${book.genre || 'N/A'}</p>
+                <p><strong>Description:</strong> ${book.description || 'No description available.'}</p>
+              </div>
+            `;
+            resultsContainer.appendChild(card);
+          });
+        })
+        .catch(err => {
+          console.error('Search error:', err);
+          resultsContainer.innerHTML = '<p>Server error while searching.</p>';
+        });
+    }
+    input.addEventListener('input', () => { performSearch(input.value.trim()); });
+    button.addEventListener('click', () => { performSearch(input.value.trim()); });
+  </script>
+</body>
+</html>

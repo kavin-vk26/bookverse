@@ -1,0 +1,156 @@
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #FAF3E0;
+  color: #2E2E2E;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background-color: #DDBEA9;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.logo {
+  font-size: 26px;
+  font-weight: bold;
+  color: #6C584C;
+}
+.nav-links a {
+  text-decoration: none;
+  margin-left: 24px;
+  color: #2E2E2E;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.nav-links a:hover {
+  color: #A3B18A;
+}
+main {
+  flex: 1;
+  padding: 40px 20px;
+  max-width: 900px;
+  margin: auto;
+}
+.intro h1 {
+  font-size: 34px;
+  color: #6C584C;
+  margin-bottom: 12px;
+}
+.intro p {
+  font-size: 18px;
+  color: #444;
+  margin-bottom: 30px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+input[type="text"], textarea {
+  padding: 12px;
+  background-color: #FAF3E0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+button, .google-btn {
+  padding: 12px 20px;
+  background-color: #A3B18A;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:hover, .google-btn:hover {
+  background-color: #889971;
+}
+footer {
+  background-color: #2E2E2E;
+  color: #FAF3E0;
+  text-align: center;
+  padding: 20px;
+  font-size: 14px;
+  margin-top: auto;
+}
+
+/* --- Book Reviews Section --- */
+#reviews-section {
+  margin-top: 32px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 8px #ddd;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#reviews-section h3 {
+  color: #A3B18A;
+  margin-bottom: 16px;
+}
+#reviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+#reviewForm select,
+#reviewForm textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #A3B18A;
+  background: #FAF3E0;
+  font-size: 1rem;
+}
+#reviewForm button {
+  align-self: flex-end;
+  padding: 10px 22px;
+  background: #A3B18A;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#reviewForm button:hover {
+  background: #6C584C;
+}
+.review {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0 6px 0;
+  margin-bottom: 8px;
+}
+.review:last-child { border-bottom: none; }
+.review .review-name {
+  font-weight: bold;
+  color: #6C584C;
+}
+.review .review-rating {
+  color: #A3B18A;
+  font-size: 1.05em;
+  margin-left: 6px;
+}
+.review .review-date {
+  color: #888;
+  font-size: 13px;
+  margin-top: 3px;
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .profile-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+    }
+    .profile-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(44, 62, 80, 0.12);
+      padding: 38px 40px 28px 40px;
+      max-width: 410px;
+      width: 100%;
+      text-align: center;
+      margin-top: 56px;
+      margin-bottom: 56px;
+      animation: fadeIn 0.7s cubic-bezier(.23,1.01,.32,1) 1;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(22px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .profile-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #A3B18A;
+      margin-bottom: 18px;
+      background: #FAF3E0;
+    }
+    .profile-name {
+      font-size: 2rem;
+      color: #6C584C;
+      font-weight: 700;
+      margin-bottom: 7px;
+      margin-top: 0;
+    }
+    .profile-email {
+      font-size: 1.08rem;
+      color: #666;
+      margin-bottom: 17px;
+      word-break: break-all;
+    }
+    .spinner {
+      margin: 90px auto 0 auto;
+      border: 5px solid #eee;
+      border-top: 5px solid #A3B18A;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg);}
+    }
+    .profile-error {
+      text-align: center;
+      color: #c0392b;
+      margin: 40px auto;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">📚 BookVerse</div>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/add">Add Book</a>
+      <a href="/search">Search</a>
+      <a href="/profile">Profile</a>
+      <a href="/logout">Logout</a>
+    </nav>
+  </header>
+
+  <main class="profile-main">
+    <div id="profile-content">
+      <div class="spinner"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 BookVerse. Made with ☕ & ❤️ by Kavin.</p>
+  </footer>
+  <script>
+    // Returns a default SVG avatar as a data URI
+    function getDefaultAvatar() {
+      return 'data:image/svg+xml;utf8,<svg width="110" height="110" xmlns="http://www.w3.org/2000/svg"><circle cx="55" cy="55" r="55" fill="%23DDBEA9"/><circle cx="55" cy="50" r="28" fill="%23FAF3E0"/><ellipse cx="55" cy="90" rx="23" ry="13" fill="%23FAF3E0"/></svg>';
+    }
+    fetch('/profile-data')
+      .then(res => {
+        if (!res.ok) throw new Error('Not logged in');
+        return res.json();
+      })
+      .then(data => {
+        let avatar =
+          data.picture ||
+          (data.photos && data.photos[0] && data.photos[0].value) ||
+          getDefaultAvatar();
+        // If the Google profile photo is a broken link, fallback to default
+        const name = data.name || data.displayName || "Unknown User";
+        const email = data.email || (data.emails && data.emails[0] && data.emails[0].value) || "No public email";
+        document.getElementById('profile-content').innerHTML = `
+          <div class="profile-card">
+            <img src="${avatar}" alt="Profile Picture" class="profile-avatar" onerror="this.src='${getDefaultAvatar()}'" />
+            <h2 class="profile-name">${name}</h2>
+            <div class="profile-email">${email}</div>
+          </div>
+        `;
+      })
+      .catch(err => {
+        document.getElementById('profile-content').innerHTML = `<div class="profile-error">Not logged in.<br><a href="/login">Login with Google</a></div>`;
+      });
+  </script>
+</body>
+</html>
