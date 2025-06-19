@@ -15,6 +15,8 @@
         <a href="/">Home</a>
         <a href="/add">Add Book</a>
         <a href="/search" class="active">Search</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
       </nav>
     </div>
   </header>
@@ -23,7 +25,6 @@
       <h1>Search for Books</h1>
       <div class="search-box">
         <input type="text" id="search-input" placeholder="Search by title, author, genre, or description..." />
-        <button id="search-button">Search</button>
       </div>
       <div class="results-container" id="results"></div>
     </div>
@@ -31,8 +32,9 @@
   <footer>© 2025 BookVerse. Made with ☕ & ❤️ by Kavin.</footer>
   <script>
     const input = document.getElementById('search-input');
-    const button = document.getElementById('search-button');
     const resultsContainer = document.getElementById('results');
+    let debounceTimeout = null;
+
     function performSearch(query) {
       if (!query) { resultsContainer.innerHTML = ''; return; }
       fetch(`/api/search?q=${encodeURIComponent(query)}`)
@@ -56,20 +58,24 @@
               <div>
                 <h3>${book.title}</h3>
                 <p><strong>Author:</strong> ${book.author}</p>
-                <p><strong>Genre:</strong> ${book.genre || 'N/A'}</p>
-                <p><strong>Description:</strong> ${book.description || 'No description available.'}</p>
+                <p><strong>Genre:</strong> ${book.genre}</p>
+                <p><strong>Description:</strong> ${book.description}</p>
+                <p><strong>Status:</strong> ${book.status || 'Want to Read'}</p>
+                <p><strong>Notes:</strong> ${book.notes || 'No notes.'}</p>
               </div>
             `;
             resultsContainer.appendChild(card);
           });
-        })
-        .catch(err => {
-          console.error('Search error:', err);
-          resultsContainer.innerHTML = '<p>Server error while searching.</p>';
         });
     }
-    input.addEventListener('input', () => { performSearch(input.value.trim()); });
-    button.addEventListener('click', () => { performSearch(input.value.trim()); });
+
+    // Live search as you type, with debounce
+    input.addEventListener('input', () => {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        performSearch(input.value);
+      }, 300); // 300ms debounce for better UX
+    });
   </script>
 </body>
 </html>

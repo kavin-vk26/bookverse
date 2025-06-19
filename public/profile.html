@@ -4,37 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profile - BookVerse</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css" />
   <style>
-    .profile-main {
-      max-width: 500px;
-      margin: auto;
-      margin-top: 36px;
-      background: #fff;
-      padding: 30px 22px;
-      border-radius: 16px;
-      box-shadow: 0 2px 14px rgba(46,46,46,0.07);
+    body {
+      background: #faf6ed;
+      font-family: 'Roboto', Arial, sans-serif;
     }
+    .profile-main {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 70vh;
+    }
+    .profile-card {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(163,177,138,0.11);
+      padding: 44px 36px 36px 36px;
+      margin: 48px 0;
+      max-width: 480px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      animation: floatIn 1s cubic-bezier(.4,2,.6,1.12);
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(60px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+
     .profile-title {
-      font-size: 2rem;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 2.2rem;
       color: #6C584C;
-      margin-bottom: 20px;
-      font-weight: bold;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+    }
+    .profile-divider {
+      border: none;
+      border-top: 2px solid #d1cbc2;
+      width: 70px;
+      margin: 18px auto 22px auto;
+    }
+    .profile-info {
+      margin-bottom: 32px;
       text-align: center;
     }
-    .profile-list {
-      margin-top: 18px;
-      font-size: 1.1em;
+    .profile-info .profile-avatar {
+      display: inline-block;
+      margin-bottom: 12px;
     }
-    .profile-list li {
-      margin-bottom: 7px;
+    .profile-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #A3B18A;
+      background: #f9faf7;
+      box-shadow: 0 1px 9px #a3b18a1a;
     }
-    .profile-item {
-      margin-bottom: 15px;
+    .profile-label {
+      font-weight: 700;
+      color: #6C584C;
+      margin-right: 4px;
+    }
+    .profile-email {
+      font-size: 1rem;
+      color: #7f8c8d;
+      margin-bottom: 3px;
+    }
+    .profile-stats-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .profile-stats-list li {
+      font-size: 1.12rem;
+      margin: 10px 0;
+      line-height: 1.4;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .status-badge {
+      display: inline-block;
+      border-radius: 16px;
+      padding: 2px 15px 2px 10px;
+      margin-right: 7px;
+      font-size: 1.05em;
+      color: #fff;
+      font-weight: bold;
+      vertical-align: middle;
+      letter-spacing: 0.5px;
+    }
+    .badge-want { background: linear-gradient(90deg,#a3b18a 60%,#b5c99a 100%);}
+    .badge-reading { background: linear-gradient(90deg,#f9b44d 60%,#ffe082 100%);}
+    .badge-finished { background: linear-gradient(90deg,#6c584c 60%,#a98467 100%);}
+    .profile-favs {
+      background: #f1efe9;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      box-shadow: 0 1px 8px #a3b18a25;
+    }
+    .profile-favs b {
+      color: #6C584C;
+      font-weight: 700;
+    }
+    @media (max-width: 650px) {
+      .profile-card { padding: 16px 5vw;}
+      .profile-title { font-size: 1.3rem;}
     }
     .spinner {
-      margin: 60px auto;
+      margin: 48px auto;
       border: 5px solid #eee;
       border-top: 5px solid #A3B18A;
       border-radius: 50%;
@@ -66,10 +156,8 @@
       <a href="/logout">Logout</a>
     </nav></div>
   </header>
-
   <main class="profile-main">
-    <h2 class="profile-title">Your Profile & Stats</h2>
-    <div id="profile-content">
+    <div class="profile-card" id="profile-card">
       <div class="spinner"></div>
     </div>
   </main>
@@ -79,24 +167,45 @@
       .then(res => res.json())
       .then(data => {
         if (data.error) {
-          document.getElementById('profile-content').innerHTML = `<div class="profile-error">${data.error}</div>`;
+          document.getElementById('profile-card').innerHTML = `<div class="profile-error">${data.error}</div>`;
           return;
         }
-        document.getElementById('profile-content').innerHTML = `
-          <div class="profile-item"><b>Name:</b> ${data.name}</div>
-          <div class="profile-item"><b>Email:</b> ${data.email}</div>
-          <div class="profile-item"><b>Total Books:</b> ${data.totalBooks}</div>
-          <ul class="profile-list">
-            <li><b>Want to Read:</b> ${data.statusCounts['Want to Read'] || 0}</li>
-            <li><b>Reading:</b> ${data.statusCounts['Reading'] || 0}</li>
-            <li><b>Finished:</b> ${data.statusCounts['Finished'] || 0}</li>
+        // You can use a default avatar or user's photo if available
+        const avatarUrl = "https://ui-avatars.com/api/?background=a3b18a&color=fff&name=" + encodeURIComponent(data.name || "User");
+
+        document.getElementById('profile-card').innerHTML = `
+          <div class="profile-title">Your Profile &amp; Stats</div>
+          <hr class="profile-divider" />
+          <div class="profile-info">
+            <img class="profile-avatar" src="${avatarUrl}" alt="Profile Avatar"/>
+            <div><span class="profile-label">Name:</span> ${data.name}</div>
+            <div class="profile-email">${data.email}</div>
+          </div>
+          <div style="font-size:1.15em;text-align:center;margin-bottom:10px;">
+            <span class="profile-label">Total Books:</span> <b style="font-size:1.08em;color:#6C584C;">${data.totalBooks}</b>
+          </div>
+          <ul class="profile-stats-list">
+            <li>
+              <span class="status-badge badge-want">📚 Want to Read</span>
+              <span>${data.statusCounts['Want to Read'] || 0}</span>
+            </li>
+            <li>
+              <span class="status-badge badge-reading">📖 Reading</span>
+              <span>${data.statusCounts['Reading'] || 0}</span>
+            </li>
+            <li>
+              <span class="status-badge badge-finished">🏁 Finished</span>
+              <span>${data.statusCounts['Finished'] || 0}</span>
+            </li>
           </ul>
-          <div class="profile-item"><b>Favorite Genre:</b> ${data.favoriteGenre || 'N/A'}</div>
-          <div class="profile-item"><b>Favorite Author:</b> ${data.favoriteAuthor || 'N/A'}</div>
+          <div class="profile-favs">
+            <div><b>Favorite Genre:</b> ${data.favoriteGenre || 'N/A'}</div>
+            <div><b>Favorite Author:</b> ${data.favoriteAuthor || 'N/A'}</div>
+          </div>
         `;
       })
       .catch(() => {
-        document.getElementById('profile-content').innerHTML = `<div class="profile-error">Could not load profile data.</div>`;
+        document.getElementById('profile-card').innerHTML = `<div class="profile-error">Could not load profile data.</div>`;
       });
   </script>
 </body>
