@@ -20,7 +20,7 @@ const pool = new Pool({
 // Get all books (optional: can be public or protected)
 router.get('/', ensureAuthenticated, async (req, res) => {
   try {
-    const results = await pool.query('SELECT * FROM books ORDER BY id DESC');
+    const results = await pool.query('SELECT * FROM books WHERE user_id = $1 ORDER BY id DESC');
     res.json(results.rows);
   } catch (err) {
     res.status(500).send('Error fetching books');

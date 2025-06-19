@@ -78,12 +78,14 @@ app.get('/api/search', ensureAuthenticated, async (req, res) => {
   const { q } = req.query;
   try {
     const results = await pool.query(`
-      SELECT * FROM books
-      WHERE title ILIKE $1
-         OR author ILIKE $1
-         OR genre ILIKE $1
-         OR description ILIKE $1
-    `, [`%${q}%`]);
+  SELECT * FROM books
+  WHERE user_id = $2 AND (
+    title ILIKE $1
+    OR author ILIKE $1
+    OR genre ILIKE $1
+    OR description ILIKE $1
+  )
+`, [`%${q}%`, req.user.id]);
     res.json(results.rows);
   } catch (err) {
     console.error('Search error:', err.message);
