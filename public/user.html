@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Profile - BookVerse</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .user-profile-card {
+      max-width: 650px;
+      background: #fff;
+      margin: 40px auto;
+      border-radius: 16px;
+      box-shadow: 0 2px 14px #a3b18a1a;
+      padding: 34px 24px 24px 24px;
+      text-align: center;
+    }
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      border: 3px solid #A3B18A;
+      background: #f9faf7;
+      box-shadow: 0 1px 9px #a3b18a1a;
+    }
+    .profile-name {
+      font-size: 1.5rem;
+      color: #6C584C;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .profile-email { color: #888; margin-bottom: 10px;}
+    .follow-info {
+      margin: 8px 0 16px 0;
+      color: #888;
+      font-size: 0.99em;
+    }
+    .profile-follow-btn {
+      padding: 7px 22px;
+      border-radius: 23px;
+      border: none;
+      font-size: 1.05em;
+      background: #A3B18A;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: background 0.18s;
+    }
+    .profile-follow-btn.following { background: #6C584C; }
+    .profile-follow-btn:disabled { opacity: 0.6; cursor: default;}
+    .user-books-list { margin-top: 24px;}
+    .user-book-card {
+      background: #f8f8f4;
+      border-radius: 10px;
+      box-shadow: 0 1px 6px #a3b18a16;
+      margin: 0 auto 18px auto;
+      padding: 14px 18px;
+      text-align: left;
+      max-width: 420px;
+    }
+    .user-book-title { font-weight: bold; color: #6C584C;}
+    .user-book-author { font-size: 0.98em; color: #888;}
+    .user-book-status { font-size: 0.98em; margin-top: 6px;}
+    @media (max-width: 700px) {
+      .user-profile-card { padding: 10px 3vw;}
+      .user-book-card { padding: 10px 4vw;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">BookVerse</div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/add">Add Book</a>
+        <a href="/search">Search</a>
+        <a href="/discover">Discover</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="user-profile-card" id="user-profile-card">
+      <div class="spinner"></div>
+    </div>
+  </main>
+  <footer>© 2025 BookVerse. Made with ☕ & ❤️ by Kavin.</footer>
+  <script>
+    function getQueryParam(param) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+    const userId = getQueryParam('id');
+    let myId = null;
+    fetch('/profile-data')
+      .then(res => res.json())
+      .then(me => { myId = me.id; renderProfile(); });
+
+    function renderProfile() {
+      if (!userId) {
+        document.getElementById('user-profile-card').innerHTML = "<p>User not specified.</p>";
+      } else {
+        fetch('/api/users/' + userId)
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              document.getElementById('user-profile-card').innerHTML = `<div class="profile-error">${data.error}</div>`;
+              return;
+            }
+            const u = data.user;
+            const avatarUrl = `https://ui-avatars.com/api/?background=a3b18a&color=fff&name=${encodeURIComponent(u.name)}`;
+            document.getElementById('user-profile-card').innerHTML = `
+              <img class="profile-avatar" src="${avatarUrl}" alt="Profile Avatar"/>
+              <div class="profile-name">${u.name}</div>
+              <div class="profile-email">${u.email}</div>
+              <div class="follow-info">
+                <span>Followers: ${data.followers}</span> |
+                <span>Following: ${data.following}</span>
+              </div>
+              ${u.id != myId ? `
+                <button class="profile-follow-btn ${data.amFollowing ? 'following' : ''}" id="follow-btn">
+                  ${data.amFollowing ? 'Following' : 'Follow'}
+                </button>
+              ` : ''}
+              <div class="user-books-list" id="user-books-list">
+                <h3 style="color:#A3B18A;">${u.name.split(' ')[0]}'s Books</h3>
+                <div id="book-list-cards"></div>
+              </div>
+            `;
+            // Books
+            const bookList = document.getElementById('book-list-cards');
+            if (!data.books.length) {
+              bookList.innerHTML = "<p>No books yet.</p>";
+            } else {
+              data.books.forEach(b => {
+                const bookDiv = document.createElement('div');
+                bookDiv.className = "user-book-card";
+                bookDiv.innerHTML = `
+                  <div class="user-book-title">${b.title}</div>
+                  <div class="user-book-author">by ${b.author}</div>
+                  <div class="user-book-status"><b>Status:</b> ${b.status || 'Want to Read'}</div>
+                  <div style="margin:3px 0 0 0;"><b>Notes:</b> ${b.notes || '<i>No notes</i>'}</div>
+                `;
+                bookList.appendChild(bookDiv);
+              });
+            }
+            // Follow/Unfollow logic
+            const followBtn = document.getElementById('follow-btn');
+            if (followBtn) {
+              followBtn.onclick = function() {
+                followBtn.disabled = true;
+                const action = followBtn.classList.contains('following') ? 'unfollow' : 'follow';
+                fetch(`/api/users/${u.id}/${action}`, {method:'POST'})
+                  .then(res=>res.json()).then(resp=>{
+                    if (resp.success) {
+                      followBtn.classList.toggle('following');
+                      followBtn.textContent = followBtn.classList.contains('following') ? 'Following' : 'Follow';
+                      window.location.reload();
+                    }
+                  });
+              };
+            }
+          });
+      }
+    }
+  </script>
+</body>
+</html>

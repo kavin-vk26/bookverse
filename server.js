@@ -9,6 +9,10 @@ require('./config/passport')(passport);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const usersRouter = require('./routes/users');
+app.use('/api/users', usersRouter);
+
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -51,6 +55,13 @@ app.get('/profile', ensureAuthenticated, (req, res) => {
 });
 app.get('/profile-data', ensureAuthenticated, (req, res) => {
   res.json(req.user);
+});
+
+app.get('/discover', ensureAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'discover.html'));
+});
+app.get('/user.html', ensureAuthenticated, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'user.html'));
 });
 
 // Google OAuth endpoints

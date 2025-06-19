@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Discover Readers - BookVerse</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .user-list { max-width: 600px; margin: 40px auto; }
+    .user-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 14px #a3b18a1a;
+      margin-bottom: 20px;
+      padding: 18px 20px 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .user-avatar {
+      width: 54px; height: 54px; border-radius: 50%; border: 2px solid #A3B18A;
+      margin-right: 10px;
+    }
+    .user-details { flex: 1; }
+    .user-details a { color: #6C584C; font-weight: bold; text-decoration: none;}
+    .user-details a:hover { text-decoration: underline;}
+    .user-email { font-size: 0.98em; color: #888; }
+    .no-users {
+      text-align: center;
+      color: #888;
+      font-size: 1.2em;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">BookVerse</div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/add">Add Book</a>
+        <a href="/search">Search</a>
+        <a href="/discover" class="active">Discover</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <h1 style="text-align:center;margin-top:35px;color:#6C584C;">Discover Readers</h1>
+    <div class="user-list" id="user-list"></div>
+  </main>
+  <footer>© 2025 BookVerse. Made with ☕ & ❤️ by Kavin.</footer>
+  <script>
+    fetch('/api/users/all')
+      .then(res => {
+        if (!res.ok) throw new Error("Network error");
+        return res.json();
+      })
+      .then(users => {
+        const list = document.getElementById('user-list');
+        if(!users || users.length === 0) {
+          list.innerHTML = "<div class='no-users'>No other users yet. Invite your friends!</div>";
+          return;
+        }
+        users.forEach(u => {
+          const card = document.createElement('div');
+          card.className = "user-card";
+          card.innerHTML = `
+            <img class="user-avatar" src="https://ui-avatars.com/api/?background=a3b18a&color=fff&name=${encodeURIComponent(u.name)}" alt="${u.name}"/>
+            <div class="user-details">
+              <a href="/user.html?id=${u.id}">${u.name}</a>
+              <div class="user-email">${u.email}</div>
+            </div>
+          `;
+          list.appendChild(card);
+        });
+      })
+      .catch(() => {
+        document.getElementById('user-list').innerHTML = "<div class='no-users'>Couldn't load users. Please try again.</div>";
+      });
+  </script>
+</body>
+</html>
