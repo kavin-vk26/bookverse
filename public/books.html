@@ -19,72 +19,8 @@
     .book-detail-card h2 {
       color: #6C584C;
     }
-    /* Review Section Styles */
-    #reviews-section {
-      margin-top: 32px;
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 1px 8px #ddd;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #reviews-section h3 {
-      color: #A3B18A;
-      margin-bottom: 16px;
-    }
-    #reviewForm {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 28px;
-    }
-    #reviewForm select,
-    #reviewForm textarea {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #A3B18A;
-      background: #FAF3E0;
-      font-size: 1rem;
-    }
-    #reviewForm button {
-      align-self: flex-end;
-      padding: 10px 22px;
-      background: #A3B18A;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    #reviewForm button:hover {
-      background: #6C584C;
-    }
-    .review {
-      border-bottom: 1px solid #eee;
-      padding: 10px 0 6px 0;
-      margin-bottom: 8px;
-    }
-    .review:last-child { border-bottom: none; }
-    .review .review-name {
-      font-weight: bold;
-      color: #6C584C;
-    }
-    .review .review-rating {
-      color: #A3B18A;
-      font-size: 1.05em;
-      margin-left: 6px;
-    }
-    .review .review-date {
-      color: #888;
-      font-size: 13px;
-      margin-top: 3px;
-    }
     @media (max-width: 650px) {
-      .book-detail-card, #reviews-section { max-width: 97vw; padding: 12px; }
+      .book-detail-card { max-width: 97vw; padding: 12px; }
     }
   </style>
 </head>
@@ -102,22 +38,6 @@
   <main>
     <div class="book-detail-card" id="book-card">
       <!-- Book details will be loaded here -->
-    </div>
-    <div id="reviews-section">
-      <h3>Reviews & Ratings</h3>
-      <form id="reviewForm">
-        <select name="rating" required>
-          <option value="">Rate this book</option>
-          <option value="5">★★★★★</option>
-          <option value="4">★★★★</option>
-          <option value="3">★★★</option>
-          <option value="2">★★</option>
-          <option value="1">★</option>
-        </select>
-        <textarea name="review" placeholder="Write your review..." required></textarea>
-        <button type="submit">Submit</button>
-      </form>
-      <div id="all-reviews"></div>
     </div>
   </main>
   <footer>© 2025 BookVerse. Made with ☕ & ❤️ by Kavin.</footer>
@@ -137,49 +57,7 @@
           ${book.cover_url ? `<img src="${book.cover_url}" alt="Book Cover" style="max-width:120px;border-radius:10px;margin-top:12px;">` : ''}
         `;
       });
-
-    // Reviews logic
-    const reviewForm = document.getElementById('reviewForm');
-    const allReviews = document.getElementById('all-reviews');
-
-    function fetchReviews() {
-      fetch(`/api/reviews/${bookId}`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data.length) {
-            allReviews.innerHTML = "<div style='color:#888'>No reviews yet. Be the first!</div>";
-            return;
-          }
-          allReviews.innerHTML = data.map(r => `
-            <div class="review">
-              <span class="review-name">${r.display_name || "User"}</span>
-              <span class="review-rating">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-              <div>${r.review}</div>
-              <div class="review-date">${new Date(r.created_at).toLocaleString()}</div>
-            </div>
-          `).join('');
-        });
-    }
-    fetchReviews();
-
-    reviewForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const formData = new FormData(reviewForm);
-      formData.append('book_id', bookId);
-      fetch('/api/reviews/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData)
-      }).then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            reviewForm.reset();
-            fetchReviews();
-          } else {
-            alert('Error posting review.');
-          }
-        });
-    });
+    // All review logic has been removed.
   </script>
 </body>
 </html>
