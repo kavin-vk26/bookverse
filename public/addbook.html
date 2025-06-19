@@ -67,6 +67,16 @@
         <label for="cover_url">Cover Image URL</label>
         <input type="url" name="cover_url" id="cover_url" placeholder="https://example.com/book-cover.jpg" />
 
+        <label for="status">Status</label>
+        <select name="status" id="status" required>
+          <option value="Want to Read">Want to Read</option>
+          <option value="Reading">Reading</option>
+          <option value="Finished">Finished</option>
+        </select>
+
+        <label for="notes">Personal Notes</label>
+        <textarea name="notes" id="notes" placeholder="Add your thoughts, reviews, or reading notes!"></textarea>
+
         <button type="submit">Add Book</button>
       </form>
     </div>

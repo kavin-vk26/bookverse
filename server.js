@@ -69,6 +69,35 @@ app.get('/auth/google/callback',
 const booksRouter = require('./routes/books');
 app.use('/api/books', booksRouter);
 
+app.get('/api/profile-stats', ensureAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  });
+
+  try {
+    const userQ = await pool.query('SELECT name, email FROM users WHERE id = $1', [userId]);
+    const totalQ = await pool.query('SELECT COUNT(*) FROM books WHERE user_id = $1', [userId]);
+    const byStatusQ = await pool.query('SELECT status, COUNT(*) FROM books WHERE user_id = $1 GROUP BY status', [userId]);
+    const genreQ = await pool.query('SELECT genre, COUNT(*) AS c FROM books WHERE user_id=$1 GROUP BY genre ORDER BY c DESC LIMIT 1', [userId]);
+    const authorQ = await pool.query('SELECT author, COUNT(*) AS c FROM books WHERE user_id=$1 GROUP BY author ORDER BY c DESC LIMIT 1', [userId]);
+    const statusCounts = {};
+    byStatusQ.rows.forEach(r => statusCounts[r.status] = parseInt(r.count));
+
+    res.json({
+      name: userQ.rows[0]?.name || "",
+      email: userQ.rows[0]?.email || "",
+      totalBooks: parseInt(totalQ.rows[0]?.count) || 0,
+      statusCounts,
+      favoriteGenre: genreQ.rows[0]?.genre || null,
+      favoriteAuthor: authorQ.rows[0]?.author || null
+    });
+  } catch (err) {
+    res.json({ error: "Failed to load stats." });
+  }
+});
+
 // Book search API (protected)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,

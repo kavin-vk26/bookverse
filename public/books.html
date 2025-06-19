@@ -56,10 +56,11 @@
           <p><strong>Author:</strong> ${book.author}</p>
           <p><strong>Genre:</strong> ${book.genre || 'N/A'}</p>
           <p><strong>Description:</strong> ${book.description || 'No description available.'}</p>
+          <p><strong>Status:</strong> ${book.status || 'Want to Read'}</p>
+          <p><strong>Notes:</strong> ${book.notes || 'No notes.'}</p>
           ${book.cover_url ? `<img src="${book.cover_url}" alt="Book Cover" style="max-width:120px;border-radius:10px;margin-top:12px;">` : ''}
         `;
       });
-    // All review logic has been removed.
   </script>
 </body>
 </html>
